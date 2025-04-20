@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ouizz - English Quiz</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #cb1168, #2575fc);
+      color: white;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .quiz-box {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #timer {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      color: #ffd700;
+    }
+
+    #question {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .option:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .correct {
+      background-color: #28a745 !important; /* green */
+    }
+
+    .wrong {
+      background-color: #dc3545 !important; /* red */
+    }
+
+    #score {
+      margin-top: 15px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-box">
+    <h1>English Quiz</h1>
+    <div id="timer">⏳ Time Left: 10s</div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+   const questions = [
+  { question: "What is a synonym for 'happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], answer: "Joyful" },
+  { question: "Which is a verb?", options: ["Run", "Blue", "Fast", "Sky"], answer: "Run" },
+  { question: "What is the antonym of 'hot'?", options: ["Cold", "Warm", "Burning", "Boiling"], answer: "Cold" },
+  { question: "Choose the correct sentence:", options: [
+      "She don't like apples.",
+      "She doesn't likes apples.",
+      "She doesn't like apples.",
+      "She don't likes apples."
+    ], answer: "She doesn't like apples."
+  },
+  { question: "Identify the adjective in the sentence: 'The quick brown fox jumps over the lazy dog.'", options: [
+      "fox", "jumps", "quick", "over"
+    ], answer: "quick"
+  },
+  { question: "Which word is an antonym of 'scarce'?", options: ["Rare", "Abundant", "Tiny", "Little"], answer: "Abundant" },
+  { question: "What part of speech is the word 'beautifully'?", options: ["Adjective", "Verb", "Noun", "Adverb"], answer: "Adverb" },
+  { question: "Choose the correctly punctuated sentence:", options: [
+      "Its raining outside.",
+      "It’s raining outside.",
+      "Its’ raining outside.",
+      "Its raining, outside."
+    ], answer: "It’s raining outside."
+  },
+  { question: "Which sentence uses a homophone correctly?", options: [
+      "Their going to the park.",
+      "They're dog is cute.",
+      "There going over their.",
+      "They're going to their house."
+    ], answer: "They're going to their house."
+  },
+  { question: "What is the past participle of 'write'?", options: ["Wrote", "Written", "Writing", "Writed"], answer: "Written" }
+];
+
+
+    let currentQ = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+    const timerEl = document.getElementById("timer");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const scoreEl = document.getElementById("score");
+
+    function loadQuestion() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerEl.textContent = `⏳ Time Left: ${timeLeft}s`;
+      startTimer();
+
+      const q = questions[currentQ];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      q.options.forEach(opt => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.textContent = opt;
+        div.onclick = () => handleAnswer(opt, div);
+        optionsEl.appendChild(div);
+      });
+    }
+
+    function handleAnswer(selected, selectedEl) {
+      clearInterval(timer);
+      const correct = questions[currentQ].answer;
+
+      // Disable all options
+      const allOptions = document.querySelectorAll('.option');
+      allOptions.forEach(option => option.style.pointerEvents = 'none');
+
+      if (selected === correct) {
+        selectedEl.classList.add("correct");
+        score++;
+        scoreEl.textContent = `✅ Score: ${score}`;
+      } else {
+        selectedEl.classList.add("wrong");
+        scoreEl.textContent = `❌ Score: ${score}`;
+
+        // Also highlight the correct answer
+        allOptions.forEach(option => {
+          if (option.textContent === correct) {
+            option.classList.add("correct");
+          }
+        });
+      }
+
+      setTimeout(() => {
+        currentQ++;
+        if (currentQ < questions.length) {
+          loadQuestion();
+        } else {
+          endQuiz();
+        }
+      }, 800); // longer delay to let effect be seen
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏳ Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          handleAnswer(null, null); // time up
+        }
+      }, 1000);
+    }
+
+    function endQuiz() {
+      clearInterval(timer);
+      questionEl.textContent = "🎉 Quiz Finished!";
+      optionsEl.innerHTML = "";
+      timerEl.style.display = "none";
+      scoreEl.innerHTML = `<strong>Final Score: ${score} / ${questions.length}</strong>`;
+      setTimeout(() => {
+        window.location.href = "quiz.html";
+      }, 4000);
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>

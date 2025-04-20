@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ouizz - GK Quiz</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #11cb4c, #2575fc);
+      color: white;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .quiz-box {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #timer {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      color: #ffd700;
+    }
+
+    #question {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .option:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .correct {
+      background-color: #28a745 !important;
+    }
+
+    .wrong {
+      background-color: #dc3545 !important;
+    }
+
+    #score {
+      margin-top: 15px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-box">
+    <h1>GK  Quiz</h1>
+    <div id="timer">⏳ Time Left: 10s</div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+   const questions = [
+    { question: "What is the capital of France?", options: ["London", "Paris", "Berlin", "Rome"], answer: "Paris" },
+    { question: "Which is the largest ocean?", options: ["Indian", "Atlantic", "Pacific", "Arctic"], answer: "Pacific" },
+    { question: "How many continents are there?", options: ["5", "6", "7", "8"], answer: "7" },
+    { question: "Who wrote the Indian national anthem?", options: ["Bankim Chandra", "Rabindranath Tagore", "Gandhi", "Jawaharlal Nehru"], answer: "Rabindranath Tagore" },
+    { question: "Which planet is known as the Red Planet?", options: ["Mars", "Venus", "Jupiter", "Saturn"], answer: "Mars" },
+    { question: "What is the smallest country in the world?", options: ["Monaco", "Vatican City", "Malta", "Liechtenstein"], answer: "Vatican City" },
+    { question: "In which year did World War II end?", options: ["1942", "1945", "1948", "1950"], answer: "1945" },
+    { question: "Which is the tallest mountain in the world?", options: ["K2", "Everest", "Kilimanjaro", "Makalu"], answer: "Everest" },
+    { question: "Who is known as the father of computers?", options: ["Charles Babbage", "Alan Turing", "Bill Gates", "Steve Jobs"], answer: "Charles Babbage" },
+    { question: "Which country is famous for tulips and windmills?", options: ["Netherlands", "Belgium", "Denmark", "Switzerland"], answer: "Netherlands" }
+  ];
+ 
+
+    let currentQ = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const timerEl = document.getElementById("timer");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const scoreEl = document.getElementById("score");
+
+    function loadQuestion() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerEl.textContent = `⏳ Time Left: ${timeLeft}s`;
+      startTimer();
+
+      const q = questions[currentQ];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+
+      q.options.forEach(opt => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.textContent = opt;
+        div.onclick = () => handleAnswer(opt, div);
+        optionsEl.appendChild(div);
+      });
+    }
+
+    function handleAnswer(selected, selectedEl) {
+      clearInterval(timer);
+      const correct = questions[currentQ].answer;
+      const allOptions = document.querySelectorAll(".option");
+
+      allOptions.forEach(opt => opt.style.pointerEvents = "none");
+
+      if (selected === correct) {
+        selectedEl.classList.add("correct");
+        score++;
+        scoreEl.textContent = `✅ Score: ${score}`;
+      } else {
+        if (selectedEl) selectedEl.classList.add("wrong");
+        scoreEl.textContent = `❌ Score: ${score}`;
+        allOptions.forEach(opt => {
+          if (opt.textContent === correct) {
+            opt.classList.add("correct");
+          }
+        });
+      }
+
+      setTimeout(() => {
+        currentQ++;
+        if (currentQ < questions.length) {
+          loadQuestion();
+        } else {
+          endQuiz();
+        }
+      }, 800);
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏳ Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          handleAnswer(null, null);
+        }
+      }, 1000);
+    }
+
+    function endQuiz() {
+      clearInterval(timer);
+      questionEl.textContent = "🎉 Quiz Finished!";
+      optionsEl.innerHTML = "";
+      timerEl.style.display = "none";
+      scoreEl.innerHTML = `<strong>Final Score: ${score} / ${questions.length}</strong>`;
+      setTimeout(() => {
+        window.location.href = "quiz.html";
+      }, 4000);
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>
